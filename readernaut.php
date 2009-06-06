@@ -32,19 +32,21 @@ function rn_options() {
 	}
 	?>
 	<div class="wrap">
-		<h2><?php _e('Readernaut Options', 'rn_trans_domain'); ?></h2>
-	
+		<h2>Readernaut</h2>
+
 		<form action="<?php echo str_replace('%7E', '~', $_SERVER['REQUEST_URI']); ?>" method="post">
 			<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="Y">
-
-			<p>
-				<?php _e('Readernaut Username:', 'rn_trans_domain'); ?>
-				<input type="text" name="<?php echo $data_field_name ?>" value="<?php echo $opt_val; ?>" size="20" />
-			</p>
+			<table class="form-table">
+				<tr valign="top">
+					<th scope="row"><?php _e('Readernaut Username:', 'rn_trans_domain'); ?></th>
+					<td>
+						<input type="text" name="<?php echo $data_field_name ?>" value="<?php echo $opt_val; ?>" size="20" />		
+					</td>
+				</tr>
+			</table>
 			<p class="submit">
-				<input type="submit" name="Submit" value="<?php _e('Update Options', 'rn_trans_domain'); ?>" />
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
 			</p>
-
 		</form>
 	</div><!-- /wrap -->
 	<?php
