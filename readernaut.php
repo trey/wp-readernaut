@@ -12,9 +12,14 @@ if (is_admin()) {
 	add_action('admin_menu', 'readernaut_menu');
 	add_action('admin_init', 'register_readernaut');
 }
+add_action('init', register_readernaut_widget);
 
 function register_readernaut() {
 	register_setting('readernaut_group', 'readernaut_username');
+}
+
+function register_readernaut_widget() {
+	register_sidebar_widget('Readernaut', 'readernaut_widget');
 }
 
 function readernaut_menu() {
@@ -40,6 +45,17 @@ function readernaut_options() {
 			</p>
 		</form>
 	</div><!-- /wrap -->
+	<?php
+}
+
+function readernaut_widget($args) {
+	extract($args);
+	?>
+	<?php echo $before_widget; ?>
+		<?php echo $before_title . 'Readernaut' . $after_title; ?>
+		Hello, World!
+	<?php echo $after_widget; ?>
+
 	<?php
 }
 ?>
