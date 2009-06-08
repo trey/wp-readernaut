@@ -8,44 +8,30 @@ Version: 1.0
 Author URI: http://treypiepmeier.com/
 */
 
-add_action('admin_menu', 'rn_menu');
+add_action('admin_menu', 'readernaut_menu');
 
-function rn_menu() {
-	add_options_page('Readernaut Options', 'Readernaut', 8, __FILE__, 'rn_options');
+function readernaut_menu() {
+	add_options_page('Readernaut Options', 'Readernaut', 8, __FILE__, 'readernaut_options');
 }
 
-function rn_options() {
-	$opt_name = 'rn_username';
-	$hidden_field_name = 'rn_submit_hidden';
-	$data_field_name = 'rn_username';
-	
-	$opt_val = get_option($opt_name);
-	
-	if ($_POST[$hidden_field_name] == 'Y') {
-		$opt_val = $_POST[$data_field_name];
-		update_option($opt_name, $opt_val);
-		?>
-		<div class="updated">
-			<p><strong><?php _e('Options saved.', 'rn_trans_domain'); ?></strong></p>
-		</div><!-- /updated -->
-		<?php
-	}
+function readernaut_options() {
 	?>
 	<div class="wrap">
 		<h2>Readernaut</h2>
-
-		<form action="<?php echo str_replace('%7E', '~', $_SERVER['REQUEST_URI']); ?>" method="post">
-			<input type="hidden" name="<?php echo $hidden_field_name; ?>" value="Y">
+		<form method="post" action="options.php">
+			<?php wp_nonce_field('update-options'); ?>
 			<table class="form-table">
 				<tr valign="top">
-					<th scope="row"><?php _e('Readernaut Username:', 'rn_trans_domain'); ?></th>
+					<th scope="row"><?php _e('Readernaut Username'); ?></th>
 					<td>
-						<input type="text" name="<?php echo $data_field_name ?>" value="<?php echo $opt_val; ?>" size="20" />		
+						<input type="text" name="readernaut_username" value="<?php echo get_option('readernaut_username'); ?>" />
+						<input type="hidden" name="action" value="update" />
+						<input type="hidden" name="page_options" value="readernaut_username" />
 					</td>
 				</tr>
 			</table>
 			<p class="submit">
-				<input type="submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+				<input type="submit" class="button-primary" value="<?php _e('Save Changes'); ?>" />
 			</p>
 		</form>
 	</div><!-- /wrap -->
