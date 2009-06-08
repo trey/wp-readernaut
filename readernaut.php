@@ -20,6 +20,7 @@ function register_readernaut() {
 
 function register_readernaut_widget() {
 	register_sidebar_widget('Readernaut', 'readernaut_widget');
+	register_widget_control('Readernaut', 'readernaut_widget_control');
 }
 
 function readernaut_menu() {
@@ -47,6 +48,8 @@ function readernaut_options() {
 	</div><!-- /wrap -->
 	<?php
 }
+
+function readernaut_widget_control() {}
 
 function readernaut_widget($args) {
 	extract($args);
