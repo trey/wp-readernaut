@@ -9,13 +9,15 @@ Author URI: http://treypiepmeier.com/
 */
 
 if (is_admin()) {
-	add_action('admin_menu', 'readernaut_menu');
-	add_action('admin_init', 'register_readernaut');
+	add_action('admin_menu', readernaut_menu);
+	add_action('admin_init', register_readernaut);
 }
 add_action('init', register_readernaut_widget);
+add_action('wp_head', readernaut_style_base);
 
 function register_readernaut() {
 	register_setting('readernaut_group', 'readernaut_username');
+	register_setting('readernaut_group', 'readernaut_category');
 }
 
 function register_readernaut_widget() {
@@ -49,17 +51,21 @@ function readernaut_options() {
 	<?php
 }
 
-function readernaut_widget_control() {}
+function readernaut_widget_control() {
+	$options = get_option('readernaut_widget_settings');
+}
 
 function readernaut_widget($args) {
 	extract($args);
 	$user = get_settings('readernaut_username');
-	$books = file_get_contents('http://readernaut.com/api/v1/xml/' . $user . '/books/reading/');
+	// $category = get_settings('');
+	$category = 'wishlist';
+	$books = file_get_contents('http://readernaut.com/api/v1/xml/' . $user . '/books/' . $category . '/');
 	$sx = simplexml_load_string($books);
 	?>
 	<?php echo $before_widget; ?>
 		<?php echo $before_title . 'Readernaut' . $after_title; ?>
-
+		<h3>Currently Reading</h3>
 		<ul>
 		<?php foreach ($sx->reader_book as $book_object): ?>
 			<?php $book = $book_object->book_edition; ?>
@@ -69,5 +75,17 @@ function readernaut_widget($args) {
 
 	<?php echo $after_widget; ?>
 	<?php
+}
+
+function readernaut_style_base() {
+echo <<<EOT
+<style type="text/css" media="screen">
+	#readernaut * { margin: 0; padding: 0; }
+	#readernaut h3 { margin: 0; padding: 0; font-size: 12px; }
+	#readernaut ul li { list-style-type: none; display: inline; padding: 0 3px 3px 0; }
+	ul #readernaut ul li:before { content: ""; }
+	ul #readernaut ul { margin: 0; padding: 0; }
+</style>
+EOT;
 }
 ?>
