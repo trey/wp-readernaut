@@ -1,0 +1,5 @@
+# Readernaut Plugin / Widget
+
+Display your Readernaut books in a WordPress widget or three.
+
+Requires WordPress 2.8.
