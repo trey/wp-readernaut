@@ -2,90 +2,80 @@
 /*
 Plugin Name: Readernaut
 Plugin URI: http://github.com/trey/wp-readernaut/
-Description: Show your Readernaut books on your WordPress site.
+Description: Show the world your Readernaut books.
 Author: Trey Piepmeier
 Version: 1.0
 Author URI: http://treypiepmeier.com/
 */
 
-if (is_admin()) {
-	add_action('admin_menu', readernaut_menu);
-	add_action('admin_init', register_readernaut);
-}
-add_action('init', register_readernaut_widget);
-add_action('wp_head', readernaut_style_base);
+add_action('widgets_init', readernaut_load_widgets);
 
-function register_readernaut() {
-	register_setting('readernaut_group', 'readernaut_username');
-	register_setting('readernaut_group', 'readernaut_category');
+function readernaut_load_widgets() {
+	register_widget('Readernaut_Widget');
 }
 
-function register_readernaut_widget() {
-	register_sidebar_widget('Readernaut', 'readernaut_widget');
-	register_widget_control('Readernaut', 'readernaut_widget_control');
-}
+class Readernaut_Widget extends WP_Widget {
+	function Readernaut_Widget() {
+		$widget_ops = array('classname' => 'readernaut', 'description' => 'Display your Readernaut books');
+		$control_ops = array('id_base' => 'readernaut-widget');
+		$this->WP_Widget('readernaut-widget', 'Readernaut', $widget_ops, $control_ops);
+	}
+	
+	function widget($args, $instance) {
+		extract($args);
+		$user = $instance['user'];
+		$category = $instance['category'];
+		$title = 'Readernaut: ' . ucwords($category);
+		
+		echo $before_widget;
+		echo $before_title . '<h2>' . $title . '</h2>' . $after_title;
 
-function readernaut_menu() {
-	add_options_page('Readernaut Options', 'Readernaut', 8, __FILE__, 'readernaut_options');
-}
+		$books_xml = file_get_contents('http://readernaut.com/api/v1/xml/' . $user . '/books/' . $category . '/');
+		$books = simplexml_load_string($books_xml);
 
-function readernaut_options() {
-	?>
-	<div class="wrap">
-		<h2>Readernaut</h2>
-		<form method="post" action="options.php">
-			<?php settings_fields('readernaut_group'); ?>
-			<table class="form-table">
-				<tr valign="top">
-					<th scope="row"><?php _e('Readernaut Username'); ?></th>
-					<td>
-						<input type="text" name="readernaut_username" value="<?php echo get_option('readernaut_username'); ?>" />
-					</td>
-				</tr>
-			</table>
-			<p class="submit">
-				<input type="submit" class="button-primary" value="<?php _e('Save Changes'); ?>" />
-			</p>
-		</form>
-	</div><!-- /wrap -->
-	<?php
-}
-
-function readernaut_widget_control() {
-	$options = get_option('readernaut_widget_settings');
-}
-
-function readernaut_widget($args) {
-	extract($args);
-	$user = get_settings('readernaut_username');
-	// $category = get_settings('');
-	$category = 'wishlist';
-	$books = file_get_contents('http://readernaut.com/api/v1/xml/' . $user . '/books/' . $category . '/');
-	$sx = simplexml_load_string($books);
-	?>
-	<?php echo $before_widget; ?>
-		<?php echo $before_title . 'Readernaut' . $after_title; ?>
-		<h3>Currently Reading</h3>
+		?>
 		<ul>
-		<?php foreach ($sx->reader_book as $book_object): ?>
+		<?php foreach ($books->reader_book as $book_object): ?>
 			<?php $book = $book_object->book_edition; ?>
 			<li><a href="<?php echo $book->permalink; ?>"><img src="<?php echo $book->covers->cover_small ?>" alt="<?php echo $book->title ?>" /></a></li>
 		<?php endforeach ?>
 		</ul>
+		<?php
 
-	<?php echo $after_widget; ?>
-	<?php
+		echo $after_widget;
+	}
+	
+	function update($new_instance, $old_instance) {
+		$instance = $old_instance;
+		
+		$instance['user'] = strip_tags($new_instance['user']);
+		$instance['category'] = $new_instance['category'];
+		
+		return $instance;
+	}
+	
+	function form($instance) {
+		$defaults = array('user' => 'trey', 'category' => 'reading');
+		$instance = wp_parse_args((array) $instance, $defaults);
+		?>
+		<p>
+			<label for="<?php echo $this->get_field_id('user'); ?>">Readernaut Username:</label>
+			<input id="<?php echo $this->get_field_id('user'); ?>" name="<?php echo $this->get_field_name('user'); ?>" value="<?php echo $instance['user']; ?>" />
+		</p>
+		<p>
+			<label for="<?php echo $this->get_field_id('category'); ?>">Category:</label>
+			<select id="<?php echo $this->get_field_id('category'); ?>" name="<?php echo $this->get_field_name('category'); ?>" class="widefat">
+				<option value="reading" <?php if('reading' == $instance['category']) echo 'selected="selected"'; ?>>Reading</option>
+				<option value="wishlist" <?php if('wishlist' == $instance['category']) echo 'selected="selected"'; ?>>Wishtlist</option>
+				<option value="finished" <?php if('finished' == $instance['category']) echo 'selected="selected"'; ?>>Finished</option>
+				<option value="plan-to-read" <?php if('plan-to-read' == $instance['category']) echo 'selected="selected"'; ?>>Plan to read</option>
+				<option value="reference" <?php if('reference' == $instance['category']) echo 'selected="selected"'; ?>>Reference</option>
+				<option value="abandoned" <?php if('abandoned' == $instance['category']) echo 'selected="selected"'; ?>>Abandoned</option>
+				<option value="all" <?php if('all' == $instance['category']) echo 'selected="selected"'; ?>>All</option>
+			</select>
+		</p>
+		<?php
+	}
 }
 
-function readernaut_style_base() {
-echo <<<EOT
-<style type="text/css" media="screen">
-	#readernaut * { margin: 0; padding: 0; }
-	#readernaut h3 { margin: 0; padding: 0; font-size: 12px; }
-	#readernaut ul li { list-style-type: none; display: inline; padding: 0 3px 3px 0; }
-	ul #readernaut ul li:before { content: ""; }
-	ul #readernaut ul { margin: 0; padding: 0; }
-</style>
-EOT;
-}
 ?>
