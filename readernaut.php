@@ -53,12 +53,21 @@ function readernaut_widget_control() {}
 
 function readernaut_widget($args) {
 	extract($args);
+	$user = get_settings('readernaut_username');
+	$books = file_get_contents('http://readernaut.com/api/v1/xml/' . $user . '/books/reading/');
+	$sx = simplexml_load_string($books);
 	?>
 	<?php echo $before_widget; ?>
 		<?php echo $before_title . 'Readernaut' . $after_title; ?>
-		Hello, World!
-	<?php echo $after_widget; ?>
 
+		<ul>
+		<?php foreach ($sx->reader_book as $book_object): ?>
+			<?php $book = $book_object->book_edition; ?>
+			<li><a href="<?php echo $book->permalink; ?>"><img src="<?php echo $book->covers->cover_small ?>" alt="<?php echo $book->title ?>" /></a></li>
+		<?php endforeach ?>
+		</ul>
+
+	<?php echo $after_widget; ?>
 	<?php
 }
 ?>
