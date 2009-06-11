@@ -65,7 +65,7 @@ class Readernaut_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id('category'); ?>">Category:</label>
 			<select id="<?php echo $this->get_field_id('category'); ?>" name="<?php echo $this->get_field_name('category'); ?>" class="widefat">
 				<option value="reading" <?php if('reading' == $instance['category']) echo 'selected="selected"'; ?>>Reading</option>
-				<option value="wishlist" <?php if('wishlist' == $instance['category']) echo 'selected="selected"'; ?>>Wishtlist</option>
+				<option value="wishlist" <?php if('wishlist' == $instance['category']) echo 'selected="selected"'; ?>>Wishlist</option>
 				<option value="finished" <?php if('finished' == $instance['category']) echo 'selected="selected"'; ?>>Finished</option>
 				<option value="plan-to-read" <?php if('plan-to-read' == $instance['category']) echo 'selected="selected"'; ?>>Plan to read</option>
 				<option value="reference" <?php if('reference' == $instance['category']) echo 'selected="selected"'; ?>>Reference</option>
