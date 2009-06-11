@@ -28,18 +28,17 @@ class Readernaut_Widget extends WP_Widget {
 		$title = 'Readernaut: ' . ucwords($category);
 		
 		echo $before_widget;
-		echo $before_title . '<h2>' . $title . '</h2>' . $after_title;
+		echo $before_title . $title . $after_title;
 
 		$books_xml = file_get_contents('http://readernaut.com/api/v1/xml/' . $user . '/books/' . $category . '/');
 		$books = simplexml_load_string($books_xml);
 
 		?>
-		<ul>
+		<div style="height: 5px;"></div>
 		<?php foreach ($books->reader_book as $book_object): ?>
 			<?php $book = $book_object->book_edition; ?>
-			<li><a href="<?php echo $book->permalink; ?>"><img src="<?php echo $book->covers->cover_small ?>" alt="<?php echo $book->title ?>" /></a></li>
+			<a href="<?php echo $book->permalink; ?>"><img src="<?php echo $book->covers->cover_small ?>" alt="<?php echo $book->title ?>" /></a>
 		<?php endforeach ?>
-		</ul>
 		<?php
 
 		echo $after_widget;
